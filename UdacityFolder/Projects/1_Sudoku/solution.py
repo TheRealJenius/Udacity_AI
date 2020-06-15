@@ -91,7 +91,13 @@ def eliminate(values):
         The values dictionary with the assigned values eliminated from peers
     """
     # TODO: Copy your code from the classroom to complete this function
-    raise NotImplementedError
+    solvedvals = [box for box in values.keys() if len(values[box]) == 1]
+
+    for box in solvedvals:
+        for pbox in peers[box]:
+            values[pbox] = values[pbox].replace(values[box], '')
+
+    return values
 
 
 def only_choice(values):
@@ -115,7 +121,12 @@ def only_choice(values):
     You should be able to complete this function by copying your code from the classroom
     """
     # TODO: Copy your code from the classroom to complete this function
-    raise NotImplementedError
+    for unit in unitlist:
+        for number in '123456789':
+            choice = [box for box in unit if number in values[box]]
+            if len(choice) == 1:
+                values[choice[0]] = number
+    return values
 
 
 def reduce_puzzle(values):
@@ -133,7 +144,22 @@ def reduce_puzzle(values):
         no longer produces any changes, or False if the puzzle is unsolvable 
     """
     # TODO: Copy your code from the classroom and modify it to complete this function
-    raise NotImplementedError
+    stalled = False
+    while not stalled:
+        solved_values_before = len([box for box in values.keys() if len(values[box]) == 1])
+
+        values = eliminate(values)
+        
+        values = only_choice(values)
+
+        solved_values_after = len([box for box in values.keys() if len(values[box]) == 1])
+
+        stalled = solved_values_before == solved_values_after
+ 
+        if len([box for box in values.keys() if len(values[box]) == 0]):
+            return False
+
+    return values
 
 
 def search(values):
@@ -156,7 +182,21 @@ def search(values):
     and extending it to call the naked twins strategy.
     """
     # TODO: Copy your code from the classroom to complete this function
-    raise NotImplementedError
+    values = reduce_puzzle(values)
+    if values is False:
+        return False
+    
+    if all(len(values[box]) == 1 for box in boxes):
+        return values
+
+    choices, box = min((len(values[box]), box) for box in boxes if len(values[box]) > 1)    
+
+    for vals in values[box]:
+        new_puzzle = values.copy()
+        new_puzzle[box] = vals
+        trying = search(new_puzzle)
+        if trying:
+            return trying
 
 
 def solve(grid):
@@ -182,7 +222,6 @@ def solve(grid):
 if __name__ == "__main__":
     diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
     
-    '''
     display(grid2values(diag_sudoku_grid))
     result = solve(diag_sudoku_grid)
     display(result)
@@ -195,4 +234,3 @@ if __name__ == "__main__":
         pass
     except:
         print('We could not visualize your board due to a pygame issue. Not a problem! It is not a requirement.')
-    '''
