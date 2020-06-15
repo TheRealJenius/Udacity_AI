@@ -7,8 +7,15 @@ column_units = [cross(rows, c) for c in cols]
 square_units = [cross(rs, cs) for rs in ('ABC','DEF','GHI') for cs in ('123','456','789')]
 unitlist = row_units + column_units + square_units
 
+# print(list(zip(rows,cols))) 
+# To create diagonal units, concatenate the zip of the rows and columns into a list, and do the same in reverse 
+# - therefore A+1 = A1, B+2 = B2 and so forth as rows = 'ABCDEFGHI' and cols = '123456789'
+# - to do the opposite side, we need to put the columns in reverse so that it shos as A+9 = A9 , B+8 = B8....I+1 = I9 as rows = 'ABCDEFGHI' and cols = '987654321'
+# - both need to be in a list, if not python will compile it as a tuple
+diagonal_units = [[r + c for r, c in zip(rows, cols)], [r + c for r, c in zip(rows, cols[::-1])]]
+
 # TODO: Update the unit list to add the new diagonal units
-unitlist = unitlist
+unitlist = unitlist + diagonal_units
 
 
 # Must be called after all units (including diagonals) are added to the unitlist
@@ -164,6 +171,8 @@ def solve(grid):
 
 if __name__ == "__main__":
     diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
+    
+    '''
     display(grid2values(diag_sudoku_grid))
     result = solve(diag_sudoku_grid)
     display(result)
@@ -176,3 +185,4 @@ if __name__ == "__main__":
         pass
     except:
         print('We could not visualize your board due to a pygame issue. Not a problem! It is not a requirement.')
+    '''
