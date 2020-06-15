@@ -61,15 +61,22 @@ def naked_twins(values):
     https://github.com/udacity/artificial-intelligence/blob/master/Projects/1_Sudoku/pseudocode.md
     """
     # TODO: Implement this function!
-    for box in values:
+    
+    twins = [box for box in values.keys() if len(values[box]) == 2] # all the values with two choices
+    
+    for box in twins:        
         twin1 = values[box]
-        for pbox in peers[box]:          
-            twin2 = values[pbox]
-            if twin1 == twin2 and len(twin1) == 2:
-                for peer in peers[box]:
-                    if peer != pbox: # to avoid ameding the second twin
-                        values[peer].replace(twin1[0], '') # clear the first digit from its peers
-                        values[peer].replace(twin1[1], '') # clear the second digit form its peers
+        if len(twin1) == 2: # since there is a chance it will overwrite a twin within the twin list
+            for pbox in peers[box]:          
+                twin2 = values[pbox]
+                if twin1 == twin2: # confirm the values match
+                    # print(peers[pbox]) # debugging
+                    peertwins = set(peers[box]).intersection(peers[pbox]) # needs to be a set to ensure the values are unique | intersection or a similar method is required as it only returns the boxes of the same name within both twin 1 and twin 2
+                    # print(peertwins) # debugging
+                    for peer in peertwins:
+                        if peer != pbox: # to avoid ameding the second twin
+                            for i in range(2):
+                                values[peer] = values[peer].replace(twin1[i], '') # clear the first and second digits from its peers
 
     return values
 
@@ -149,14 +156,26 @@ def reduce_puzzle(values):
         solved_values_before = len([box for box in values.keys() if len(values[box]) == 1])
 
         values = eliminate(values)
-        
+        # print('Elimination\n\n') # debugging
+        # display(values) # debugging
+    
         values = only_choice(values)
+        # print('Only Choice\n\n') # debugging
+        # display(values) # debugging
+        
+        values = naked_twins(values)
+        # print('Naked Twins\n\n') # debugging
+        # display(values) # debugging
+    
+        
 
         solved_values_after = len([box for box in values.keys() if len(values[box]) == 1])
 
         stalled = solved_values_before == solved_values_after
  
         if len([box for box in values.keys() if len(values[box]) == 0]):
+            # print([box for box in values.keys() if len(values[box]) == 0]) # debugging
+            # display(values) # debugging
             return False
 
     return values
@@ -188,7 +207,7 @@ def search(values):
     
     if all(len(values[box]) == 1 for box in boxes):
         return values
-
+    
     choices, box = min((len(values[box]), box) for box in boxes if len(values[box]) > 1)    
 
     for vals in values[box]:
@@ -221,7 +240,6 @@ def solve(grid):
 
 if __name__ == "__main__":
     diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
-    
     display(grid2values(diag_sudoku_grid))
     result = solve(diag_sudoku_grid)
     display(result)
@@ -234,3 +252,4 @@ if __name__ == "__main__":
         pass
     except:
         print('We could not visualize your board due to a pygame issue. Not a problem! It is not a requirement.')
+    
