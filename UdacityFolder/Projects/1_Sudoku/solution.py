@@ -61,7 +61,17 @@ def naked_twins(values):
     https://github.com/udacity/artificial-intelligence/blob/master/Projects/1_Sudoku/pseudocode.md
     """
     # TODO: Implement this function!
-    raise NotImplementedError
+    for box in values:
+        twin1 = values[box]
+        for pbox in peers[box]:          
+            twin2 = values[pbox]
+            if twin1 == twin2 and len(twin1) == 2:
+                for peer in peers[box]:
+                    if peer != pbox: # to avoid ameding the second twin
+                        values[peer].replace(twin1[0], '') # clear the first digit from its peers
+                        values[peer].replace(twin1[1], '') # clear the second digit form its peers
+
+    return values
 
 
 def eliminate(values):
